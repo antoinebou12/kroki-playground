@@ -6,10 +6,12 @@ const DiagramGenerator = () => {
   const [diagramSvg, setDiagramSvg] = useState('');
   const [selectedDiagram, setSelectedDiagram] = useState(localStorage.getItem('selectedDiagram') || 'blockdiag');
   const [diagramSource, setDiagramSource] = useState(localStorage.getItem('diagramSource') || '');
+  const [error, setError] = useState('');
 
   const updateDiagram = useCallback(async () => {
-    if (!diagramSource) {
+    if (!diagramSource.trim()) {
       setDiagramSvg('');
+      setError('No diagram source provided.');
       return;
     }
 
@@ -20,8 +22,10 @@ const DiagramGenerator = () => {
       const diagramUrl = `https://kroki.io/${selectedDiagram}/svg/${encodedDiagramSource}`;
       setDiagramUrl(diagramUrl);
       localStorage.setItem('diagramSource', diagramSource);
+      setError(''); // Clear any previous error
     } catch (error) {
       console.error(error.message);
+      setError(error.message);
       setDiagramSvg('');
     }
   }, [selectedDiagram, diagramSource]);
@@ -29,7 +33,11 @@ const DiagramGenerator = () => {
   useEffect(() => {
     localStorage.setItem('selectedDiagram', selectedDiagram);
     updateDiagram();
-  }, [updateDiagram]);
+  }, [selectedDiagram, updateDiagram]);
+
+  useEffect(() => {
+    localStorage.setItem('diagramSource', diagramSource);
+  }, [diagramSource]);
 
   const copyDiagramUrlToClipboard = () => {
     navigator.clipboard.writeText(diagramUrl).then(() => {
@@ -44,7 +52,7 @@ const DiagramGenerator = () => {
     const file = new Blob([diagramSvg], {type: 'image/svg+xml'});
     element.href = URL.createObjectURL(file);
     element.download = "diagram.svg";
-    document.body.appendChild(element); // Required for this to work in FireFox
+    document.body.appendChild(element); // Required for this to work in Firefox
     element.click();
   };
 
@@ -95,15 +103,26 @@ const DiagramGenerator = () => {
       </div>
 
       <div id="diagram-result" className="content" dangerouslySetInnerHTML={{ __html: diagramSvg }}></div>
-        {diagramSvg && <button className="button is-primary" onClick={downloadDiagram}>Download SVG</button>}
       <article id="diagram-error" className="message is-danger" style={{ display: diagramUrl ? 'none' : 'block' }}>
         <div id="diagram-error-message" className="message-body"></div>
       </article>
 
-      <div className="highlight" id="diagram-url">
-        <pre><code className="language-http static">{diagramUrl}</code></pre>
-        <button className="button is-small bd-copy" onClick={copyDiagramUrlToClipboard} title="Copy to clipboard">Copy</button>
-      </div>
+      {diagramSvg && (
+        <div>
+          <button className="button is-primary" onClick={downloadDiagram}>Download SVG</button>
+          <div className="highlight" id="diagram-url">
+            <pre><code className="language-http static">{diagramUrl}</code></pre>
+            <button className="button is-small bd-copy" onClick={copyDiagramUrlToClipboard} title="Copy to clipboard">Copy</button>
+          </div>
+        </div>
+      )}
+
+      {error && (
+        <article className="message is-danger">
+          <div className="message-body">{error}</div>
+        </article>
+      )}
+    </div>
     </div>
   );
 };
