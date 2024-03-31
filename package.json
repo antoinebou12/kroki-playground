@@ -1,0 +1,11 @@
+{
+  "name": "kroki-playground",
+  "version": "1.0.0",
+  "description": "A playground for experimenting with Kroki diagrams",
+  "scripts": {
+    "start": "serve -s"
+  },
+  "dependencies": {
+    "serve": "^11.3.2"
+  }
+}
