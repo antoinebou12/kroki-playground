@@ -123,4 +123,3 @@ const DiagramGenerator = () => {
 };
 
 export default DiagramGenerator;
-export default DiagramGenerator;
