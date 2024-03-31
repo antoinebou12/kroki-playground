@@ -45,31 +45,12 @@ const DiagramGenerator = () => {
         <div className="column">
           <div className="field">
             <div className="control">
-              <textarea id="diagram-source" className="textarea code" placeholder="" rows="25">skinparam ranksep 20
-skinparam dpi 125
-skinparam packageTitleAlignment left
-
-rectangle "Main" {
-  (main.view)
-  (singleton)
-}
-rectangle "Base" {
-  (base.component)
-  (component)
-  (model)
-}
-rectangle "&lt;b&gt;main.ts&lt;/b&gt;" as main_ts
-
-(component) ..&gt; (base.component)
-main_ts ==&gt; (main.view)
-(main.view) --&gt; (component)
-(main.view) ...&gt; (singleton)
-(singleton) ---&gt; (model)</textarea>
+              <textarea id="diagram-source" className="textarea code" placeholder="" rows="25"/>
             </div>
           </div>
         </div>
         <div className="column">
-          <div id="diagram-result" className="diagram-blockdiag"><!-- Your SVG diagram will be rendered here --></div>
+          <div id="diagram-result" className="diagram-blockdiag">{/* Your SVG diagram will be rendered here */}</div>
           <article id="diagram-error" className="message is-danger is-invisible">
             <div id="diagram-error-message" className="message-body"></div>
           </article>
