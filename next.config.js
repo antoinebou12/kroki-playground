@@ -1,4 +1,5 @@
-// next.config.js
+const path = require('path');
+
 module.exports = {
   // Add custom webpack configuration
   webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
@@ -8,6 +9,7 @@ module.exports = {
       use: ['@svgr/webpack'],
     });
 
+    // Setup an alias for absolute imports
     config.resolve.alias['@'] = path.resolve(__dirname);
 
     return config;
@@ -15,11 +17,11 @@ module.exports = {
 
   // Modify server configuration
   serverRuntimeConfig: {
-    // Available only on the server side
+    // Secrets and keys, available only on the server side
     mySecret: 'secret',
   },
   publicRuntimeConfig: {
-    // Available on both server and client
+    // Configuration available on both server and client
     staticFolder: '/public',
   },
 };
