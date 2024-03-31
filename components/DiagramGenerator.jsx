@@ -4,7 +4,7 @@ import kroki from './services/kroki.js';
 const DiagramGenerator = () => {
   const [diagramUrl, setDiagramUrl] = useState('');
   const [diagramSvg, setDiagramSvg] = useState('');
-  const [selectedDiagram, setSelectedDiagram] = useState('blockdiag');
+  const [selectedDiagram, setSelectedDiagram] = useState(localStorage.getItem('selectedDiagram') || 'blockdiag');
   const [diagramSource, setDiagramSource] = useState(localStorage.getItem('diagramSource') || '');
 
   const updateDiagram = useCallback(async () => {
@@ -27,6 +27,7 @@ const DiagramGenerator = () => {
   }, [selectedDiagram, diagramSource]);
 
   useEffect(() => {
+    localStorage.setItem('selectedDiagram', selectedDiagram);
     updateDiagram();
   }, [updateDiagram]);
 
