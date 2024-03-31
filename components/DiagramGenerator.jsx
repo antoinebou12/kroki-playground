@@ -36,6 +36,32 @@ const DiagramGenerator = () => {
   const [diagramSource, setDiagramSource] = useState('');
   const [error, setError] = useState('');
 
+  // Async function to generate the diagram
+  const generateDiagram = async (diagramType, diagramSource) => {
+    // Encode and compress the diagram source
+    const encodedSource = textEncode(diagramSource);
+    const compressedSource = pako.deflate(encodedSource, { to: 'string' });
+    const base64Source = btoa(compressedSource)
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=+$/, ''); // URL safe base64 and remove padding
+
+    const urlPath = `${diagramType}/svg/${base64Source}`;
+    const url = `https://kroki.io/${urlPath}`;
+    try {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error('Failed to fetch SVG from Kroki');
+      const svgContent = await response.text();
+      setDiagramSvg(svgContent);
+      setDiagramUrl(url);
+      setError('');
+    } catch (error) {
+      console.error(error);
+      setError(error.message);
+      setDiagramSvg('');
+    }
+  };
+
   // Use useCallback to wrap the debounced convert function
   const updateDiagram = useCallback(debounce(async () => {
     if (!diagramSource.trim()) {
@@ -81,6 +107,12 @@ const DiagramGenerator = () => {
       }
     }
   }, []);
+
+  useEffect(() => {
+    if(diagramSource.trim() && selectedDiagram) {
+      generateDiagram(selectedDiagram, diagramSource);
+    }
+  }, [diagramSource, selectedDiagram]);
 
 useEffect(() => {
     if (typeof window !== 'undefined') {
