@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import pako from 'pako';
 
 // Debounce function to limit the rate at which a function is executed
 function debounce(func, wait, immediate) {
