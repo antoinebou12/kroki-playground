@@ -7,6 +7,7 @@
     "build": "next build"
   },
   "dependencies": {
+    "pako": "^2.0.4",
     "next": "^12.0.7",
     "react": "^17.0.2",
     "react-dom": "^17.0.2"
