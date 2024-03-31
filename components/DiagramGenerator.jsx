@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import kroki from 'kroki';
 
 const DiagramGenerator = () => {
   useEffect(() => {
