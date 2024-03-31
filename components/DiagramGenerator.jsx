@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import kroki from './services/krokiService';
+import kroki from './services/kroki.js';
 
 const DiagramGenerator = () => {
   const [diagramUrl, setDiagramUrl] = useState('');
