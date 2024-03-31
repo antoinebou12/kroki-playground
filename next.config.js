@@ -8,6 +8,8 @@ module.exports = {
       use: ['@svgr/webpack'],
     });
 
+    config.resolve.alias['@'] = path.resolve(__dirname);
+
     return config;
   },
 
