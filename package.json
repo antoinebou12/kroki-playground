@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "description": "A playground for experimenting with Kroki diagrams",
   "scripts": {
-    "start": "serve -s",
-    "build": "serve -s build",
+    "start": "serve -s build",
+    "build": "npm install && npm run generate",
+    "generate": "npm run build",
     "vercel-build": "npm run build"
   },
   "dependencies": {
