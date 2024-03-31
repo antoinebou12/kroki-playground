@@ -3,10 +3,12 @@
   "version": "1.0.0",
   "description": "A playground for experimenting with Kroki diagrams",
   "scripts": {
-    "start": "node server.js",
-    "build": "npm install"
+    "start": "next dev",
+    "build": "next build && next export"
   },
   "dependencies": {
-    "express": "^4.17.1"
+    "next": "^12.0.7",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
   }
 }
