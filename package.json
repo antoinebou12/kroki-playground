@@ -4,7 +4,7 @@
   "description": "A playground for experimenting with Kroki diagrams",
   "scripts": {
     "start": "serve -s",
-    "vercel-build": "npm install && npm run build"
+    "vercel-build": "npm install"
   },
   "dependencies": {
     "serve": "^11.3.2"
