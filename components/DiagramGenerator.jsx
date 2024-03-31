@@ -32,8 +32,8 @@ function textEncode(str) {
 const DiagramGenerator = () => {
   const [diagramUrl, setDiagramUrl] = useState('');
   const [diagramSvg, setDiagramSvg] = useState('');
-  const [selectedDiagram, setSelectedDiagram] = useState(localStorage.getItem('selectedDiagram') || 'blockdiag');
-  const [diagramSource, setDiagramSource] = useState(localStorage.getItem('diagramSource') || '');
+  const [selectedDiagram, setSelectedDiagram] = useState('blockdiag');
+  const [diagramSource, setDiagramSource] = useState('');
   const [error, setError] = useState('');
 
   // Use useCallback to wrap the debounced convert function
@@ -67,13 +67,27 @@ const DiagramGenerator = () => {
   }, 500), [selectedDiagram, diagramSource]);
 
   useEffect(() => {
-    localStorage.setItem('selectedDiagram', selectedDiagram);
-    updateDiagram();
-  }, [selectedDiagram, updateDiagram]);
+    // Safe guard to check if running in the browser
+    if (typeof window !== 'undefined') {
+      // Now safe to use localStorage
+      const storedSelectedDiagram = localStorage.getItem('selectedDiagram');
+      if (storedSelectedDiagram) {
+        setSelectedDiagram(storedSelectedDiagram);
+      }
 
-  useEffect(() => {
-    localStorage.setItem('diagramSource', diagramSource);
-  }, [diagramSource]);
+      const storedDiagramSource = localStorage.getItem('diagramSource');
+      if (storedDiagramSource) {
+        setDiagramSource(storedDiagramSource);
+      }
+    }
+  }, []);
+
+useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('selectedDiagram', selectedDiagram);
+      localStorage.setItem('diagramSource', diagramSource);
+    }
+  }, [selectedDiagram, diagramSource]);
 
   const copyDiagramUrlToClipboard = () => {
     navigator.clipboard.writeText(diagramUrl).then(() => {
