@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "name": "diagram-generator",
+  "builds": [
+    {
+      "src": "*.html",
+      "use": "@vercel/static-build"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/$1.html"
+    }
+  ]
+}
