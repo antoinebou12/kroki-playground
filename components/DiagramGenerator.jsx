@@ -1,43 +1,52 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 const DiagramGenerator = () => {
-  useEffect(() => {
-    document.addEventListener('DOMContentLoaded', function () {
-      // Function to update the diagram
-      function updateDiagram() {
-        var diagramSelect = document.getElementById('select-diagram');
-        var selectedDiagram = diagramSelect.options[diagramSelect.selectedIndex].value;
-        var diagramSource = document.getElementById('diagram-source').value;
-        var diagramResult = document.getElementById('diagram-result');
-        var diagramErrorMessage = document.getElementById('diagram-error-message');
-        
-        // Clear previous error messages
-        diagramErrorMessage.textContent = '';
-        
-        // Generate diagram using Kroki
-        kroki.diagram(selectedDiagram, diagramSource, 'svg', function (svg) {
-          diagramResult.innerHTML = svg;
-          // Update diagram URL
-          var diagramUrl = 'https://kroki.io/' + selectedDiagram + '/svg/' + encodeURIComponent(diagramSource);
-          var diagramUrlElement = document.querySelector('#diagram-url code');
-          diagramUrlElement.textContent = 'GET ' + diagramUrl;
-          diagramUrlElement.parentNode.parentNode.href = diagramUrl;
-        }, function (error) {
-          diagramErrorMessage.textContent = error;
-          diagramResult.innerHTML = '';
-        });
-      }
+  const [diagramUrl, setDiagramUrl] = useState('');
 
-      // Update diagram on diagram source change
-      document.getElementById('diagram-source').addEventListener('input', updateDiagram);
-      
-      // Update diagram on diagram type change
-      document.getElementById('select-diagram').addEventListener('change', updateDiagram);
-      
-      // Initial diagram update
-      updateDiagram();
-    });
+  useEffect(() => {
+    const updateDiagram = () => {
+      const diagramSelect = document.getElementById('select-diagram');
+      const selectedDiagram = diagramSelect.options[diagramSelect.selectedIndex].value;
+      const diagramSource = document.getElementById('diagram-source').value;
+      const diagramResult = document.getElementById('diagram-result');
+      const diagramErrorMessage = document.getElementById('diagram-error-message');
+
+      // Clear previous error messages
+      diagramErrorMessage.textContent = '';
+
+      // Generate diagram using Kroki
+      kroki.diagram(selectedDiagram, diagramSource, 'svg', (svg) => {
+        diagramResult.innerHTML = svg;
+        // Update diagram URL
+        const diagramUrl = `https://kroki.io/${selectedDiagram}/svg/${encodeURIComponent(diagramSource)}`;
+        setDiagramUrl(diagramUrl);
+      }, (error) => {
+        diagramErrorMessage.textContent = error;
+        diagramResult.innerHTML = '';
+      });
+    };
+
+    // Update diagram on diagram source change
+    document.getElementById('diagram-source').addEventListener('input', updateDiagram);
+
+    // Update diagram on diagram type change
+    document.getElementById('select-diagram').addEventListener('change', updateDiagram);
+
+    // Initial diagram update
+    updateDiagram();
+
+    // Cleanup event listeners
+    return () => {
+      document.getElementById('diagram-source').removeEventListener('input', updateDiagram);
+      document.getElementById('select-diagram').removeEventListener('change', updateDiagram);
+    };
   }, []);
+
+  const copyDiagramUrlToClipboard = () => {
+    const diagramUrlElement = document.querySelector('#diagram-url code');
+    const diagramUrl = diagramUrlElement.textContent;
+    navigator.clipboard.writeText(diagramUrl);
+  };
 
   return (
     <div>
