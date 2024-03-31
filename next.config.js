@@ -11,7 +11,8 @@ module.exports = {
     return config;
   },
 
+  // Define public runtime configuration
   publicRuntimeConfig: {
-    staticFolder: '/public',
+    staticFolder: '/public', // Specifies the static folder path
   },
 };
