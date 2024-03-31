@@ -1,5 +1,34 @@
 import React, { useEffect, useState, useCallback } from 'react';
 
+// Debounce function to limit the rate at which a function is executed
+function debounce(func, wait, immediate) {
+  var timeout;
+  return function() {
+    var context = this, args = arguments;
+    var later = function() {
+      timeout = null;
+      if (!immediate) func.apply(context, args);
+    };
+    var callNow = immediate && !timeout;
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+    if (callNow) func.apply(context, args);
+  };
+}
+
+// Function to encode text
+function textEncode(str) {
+  if (window.TextEncoder) {
+    return new TextEncoder().encode(str);
+  }
+  var utf8 = unescape(encodeURIComponent(str));
+  var result = new Uint8Array(utf8.length);
+  for (var i = 0; i < utf8.length; i++) {
+    result[i] = utf8.charCodeAt(i);
+  }
+  return result;
+}
+
 const DiagramGenerator = () => {
   const [diagramUrl, setDiagramUrl] = useState('');
   const [diagramSvg, setDiagramSvg] = useState('');
@@ -7,27 +36,35 @@ const DiagramGenerator = () => {
   const [diagramSource, setDiagramSource] = useState(localStorage.getItem('diagramSource') || '');
   const [error, setError] = useState('');
 
-  const updateDiagram = useCallback(async () => {
+  // Use useCallback to wrap the debounced convert function
+  const updateDiagram = useCallback(debounce(async () => {
     if (!diagramSource.trim()) {
       setDiagramSvg('');
       setError('No diagram source provided.');
       return;
     }
 
+    const encodedSource = btoa(unescape(encodeURIComponent(diagramSource)));
+    const compressedSource = btoa(String.fromCharCode.apply(null, pako.deflate(encodedSource)));
+
+    const urlPath = `${selectedDiagram}/svg/${compressedSource.replace(/\+/g, '-').replace(/\//g, '_')}`;
+    const url = `https://kroki.io/${urlPath}`;
+
     try {
-      const svg = await kroki.generateDiagram(selectedDiagram, diagramSource, 'svg');
-      setDiagramSvg(svg);
-      const encodedDiagramSource = encodeURIComponent(diagramSource);
-      const diagramUrl = `https://kroki.io/${selectedDiagram}/svg/${encodedDiagramSource}`;
-      setDiagramUrl(diagramUrl);
-      localStorage.setItem('diagramSource', diagramSource);
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const svgContent = await response.text();
+      setDiagramSvg(svgContent);
+      setDiagramUrl(url);
       setError(''); // Clear any previous error
     } catch (error) {
       console.error(error.message);
-      setError(error.message);
+      setError('Could not fetch the diagram');
       setDiagramSvg('');
     }
-  }, [selectedDiagram, diagramSource]);
+  }, 500), [selectedDiagram, diagramSource]);
 
   useEffect(() => {
     localStorage.setItem('selectedDiagram', selectedDiagram);
