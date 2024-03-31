@@ -103,10 +103,6 @@ const DiagramGenerator = () => {
       </div>
 
       <div id="diagram-result" className="content" dangerouslySetInnerHTML={{ __html: diagramSvg }}></div>
-      <article id="diagram-error" className="message is-danger" style={{ display: diagramUrl ? 'none' : 'block' }}>
-        <div id="diagram-error-message" className="message-body"></div>
-      </article>
-
       {diagramSvg && (
         <div>
           <button className="button is-primary" onClick={downloadDiagram}>Download SVG</button>
@@ -123,8 +119,8 @@ const DiagramGenerator = () => {
         </article>
       )}
     </div>
-    </div>
   );
 };
 
+export default DiagramGenerator;
 export default DiagramGenerator;
