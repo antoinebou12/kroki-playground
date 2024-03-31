@@ -11,13 +11,7 @@ module.exports = {
     return config;
   },
 
-  // Modify server configuration
-  serverRuntimeConfig: {
-    // Available only on the server side
-    mySecret: 'secret',
-  },
   publicRuntimeConfig: {
-    // Available on both server and client
     staticFolder: '/public',
   },
 };
