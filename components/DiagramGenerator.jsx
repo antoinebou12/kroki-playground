@@ -3,24 +3,26 @@ import kroki from './services/krokiService';
 
 const DiagramGenerator = () => {
   const [diagramUrl, setDiagramUrl] = useState('');
+  const [diagramSvg, setDiagramSvg] = useState('');
   const [selectedDiagram, setSelectedDiagram] = useState('blockdiag');
-  const [diagramSource, setDiagramSource] = useState('');
+  const [diagramSource, setDiagramSource] = useState(localStorage.getItem('diagramSource') || '');
 
   const updateDiagram = useCallback(async () => {
-    const diagramResult = document.getElementById('diagram-result');
-    const diagramErrorMessage = document.getElementById('diagram-error-message');
-
-    diagramErrorMessage.textContent = '';
+    if (!diagramSource) {
+      setDiagramSvg('');
+      return;
+    }
 
     try {
       const svg = await kroki.generateDiagram(selectedDiagram, diagramSource, 'svg');
-      diagramResult.innerHTML = svg;
+      setDiagramSvg(svg);
       const encodedDiagramSource = encodeURIComponent(diagramSource);
       const diagramUrl = `https://kroki.io/${selectedDiagram}/svg/${encodedDiagramSource}`;
       setDiagramUrl(diagramUrl);
+      localStorage.setItem('diagramSource', diagramSource);
     } catch (error) {
-      diagramErrorMessage.textContent = error.message;
-      diagramResult.innerHTML = '';
+      console.error(error.message);
+      setDiagramSvg('');
     }
   }, [selectedDiagram, diagramSource]);
 
@@ -30,9 +32,19 @@ const DiagramGenerator = () => {
 
   const copyDiagramUrlToClipboard = () => {
     navigator.clipboard.writeText(diagramUrl).then(() => {
+      alert('Diagram URL copied to clipboard!');
     }, (err) => {
       console.error('Could not copy diagram URL to clipboard:', err);
     });
+  };
+
+  const downloadDiagram = () => {
+    const element = document.createElement("a");
+    const file = new Blob([diagramSvg], {type: 'image/svg+xml'});
+    element.href = URL.createObjectURL(file);
+    element.download = "diagram.svg";
+    document.body.appendChild(element); // Required for this to work in FireFox
+    element.click();
   };
 
   return (
@@ -81,7 +93,8 @@ const DiagramGenerator = () => {
         </div>
       </div>
 
-      <div id="diagram-result" className="content"></div>
+      <div id="diagram-result" className="content" dangerouslySetInnerHTML={{ __html: diagramSvg }}></div>
+        {diagramSvg && <button className="button is-primary" onClick={downloadDiagram}>Download SVG</button>}
       <article id="diagram-error" className="message is-danger" style={{ display: diagramUrl ? 'none' : 'block' }}>
         <div id="diagram-error-message" className="message-body"></div>
       </article>
