@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import pako from 'pako';
 
-// Debounce function to limit the rate at which a function is executed
 function debounce(func, wait, immediate) {
   var timeout;
   return function() {
@@ -17,7 +16,6 @@ function debounce(func, wait, immediate) {
   };
 }
 
-// Function to encode text
 function textEncode(str) {
   if (window.TextEncoder) {
     return new TextEncoder().encode(str);
@@ -37,110 +35,75 @@ const DiagramGenerator = () => {
   const [diagramSource, setDiagramSource] = useState('');
   const [error, setError] = useState('');
 
-  // Async function to generate the diagram
-  const generateDiagram = async (diagramType, diagramSource) => {
-    // Encode and compress the diagram source
-    const encodedSource = textEncode(diagramSource);
+  // Correctly implemented generateDiagram function
+  const generateDiagram = useCallback(async () => {
+    if (!diagramSource.trim()) return;
+
+    const encodedSource = btoa(unescape(encodeURIComponent(diagramSource)));
     const compressedSource = pako.deflate(encodedSource, { to: 'string' });
     const base64Source = btoa(compressedSource)
       .replace(/\+/g, '-')
       .replace(/\//g, '_')
       .replace(/=+$/, ''); // URL safe base64 and remove padding
 
-    const urlPath = `${diagramType}/svg/${base64Source}`;
-    const url = `https://kroki.io/${urlPath}`;
-    try {
-      const response = await fetch(url);
-      if (!response.ok) throw new Error('Failed to fetch SVG from Kroki');
-      const svgContent = await response.text();
-      setDiagramSvg(svgContent);
-      setDiagramUrl(url);
-      setError('');
-    } catch (error) {
-      console.error(error);
-      setError(error.message);
-      setDiagramSvg('');
-    }
-  };
-
-  // Use useCallback to wrap the debounced convert function
-  const updateDiagram = useCallback(debounce(async () => {
-    if (!diagramSource.trim()) {
-      setDiagramSvg('');
-      setError('No diagram source provided.');
-      return;
-    }
-
-    const encodedSource = btoa(unescape(encodeURIComponent(diagramSource)));
-    const compressedSource = btoa(String.fromCharCode.apply(null, pako.deflate(encodedSource)));
-
-    const urlPath = `${selectedDiagram}/svg/${compressedSource.replace(/\+/g, '-').replace(/\//g, '_')}`;
-    const url = `https://kroki.io/${urlPath}`;
+    const url = `https://kroki.io/${selectedDiagram}/svg/${base64Source}`;
 
     try {
       const response = await fetch(url);
-      if (!response.ok) {
+      if (response.ok) {
+        const svgContent = await response.text();
+        setDiagramSvg(svgContent);
+        setDiagramUrl(url);
+        setError('');
+      } else {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      const svgContent = await response.text();
-      setDiagramSvg(svgContent);
-      setDiagramUrl(url);
-      setError(''); // Clear any previous error
     } catch (error) {
-      console.error(error.message);
-      setError('Could not fetch the diagram');
+      console.error(error);
+      setError('Failed to fetch the diagram');
       setDiagramSvg('');
-    }
-  }, 500), [selectedDiagram, diagramSource]);
-
-  useEffect(() => {
-    // Safe guard to check if running in the browser
-    if (typeof window !== 'undefined') {
-      // Now safe to use localStorage
-      const storedSelectedDiagram = localStorage.getItem('selectedDiagram');
-      if (storedSelectedDiagram) {
-        setSelectedDiagram(storedSelectedDiagram);
-      }
-
-      const storedDiagramSource = localStorage.getItem('diagramSource');
-      if (storedDiagramSource) {
-        setDiagramSource(storedDiagramSource);
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    if(diagramSource.trim() && selectedDiagram) {
-      generateDiagram(selectedDiagram, diagramSource);
     }
   }, [diagramSource, selectedDiagram]);
 
-useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('selectedDiagram', selectedDiagram);
-      localStorage.setItem('diagramSource', diagramSource);
-    }
+  useEffect(() => {
+    generateDiagram();
+  }, [generateDiagram]);
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        const storedSelectedDiagram = localStorage.getItem('selectedDiagram');
+        const storedDiagramSource = localStorage.getItem('diagramSource');
+        if (storedSelectedDiagram) setSelectedDiagram(storedSelectedDiagram);
+        if (storedDiagramSource) setDiagramSource(storedDiagramSource);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('selectedDiagram', selectedDiagram);
+    localStorage.setItem('diagramSource', diagramSource);
   }, [selectedDiagram, diagramSource]);
 
-  const copyDiagramUrlToClipboard = () => {
-    navigator.clipboard.writeText(diagramUrl).then(() => {
-      alert('Diagram URL copied to clipboard!');
-    }, (err) => {
-      console.error('Could not copy diagram URL to clipboard:', err);
-    });
-  };
-
+  // Handlers for user inputs and actions
+  const handleDiagramTypeChange = (e) => setSelectedDiagram(e.target.value);
+  const handleDiagramSourceChange = (e) => setDiagramSource(e.target.value);
+  const copyDiagramUrlToClipboard = () => navigator.clipboard.writeText(diagramUrl).then(() => alert('Diagram URL copied to clipboard!'));
   const downloadDiagram = () => {
     const element = document.createElement("a");
     const file = new Blob([diagramSvg], {type: 'image/svg+xml'});
     element.href = URL.createObjectURL(file);
     element.download = "diagram.svg";
-    document.body.appendChild(element); // Required for this to work in Firefox
+    document.body.appendChild(element);
     element.click();
   };
 
   return (
     <div>
+      {/* Diagram Type Selection */}
       <div className="field">
         <label className="label">Diagram Type</label>
         <div className="control">
@@ -178,29 +141,27 @@ useEffect(() => {
         </div>
       </div>
 
+      {/* Diagram Source Input */}
       <div className="field">
         <label className="label">Diagram Source</label>
         <div className="control">
-          <textarea id="diagram-source" className="textarea code" placeholder="Diagram source code" rows="10" value={diagramSource} onChange={e => setDiagramSource(e.target.value)}></textarea>
+          <textarea id="diagram-source" className="textarea" placeholder="Enter diagram source here" value={diagramSource} onChange={handleDiagramSourceChange}></textarea>
         </div>
       </div>
 
-      <div id="diagram-result" className="content" dangerouslySetInnerHTML={{ __html: diagramSvg }}></div>
+      {/* Display Diagram */}
+      <div id="diagram-result" dangerouslySetInnerHTML={{ __html: diagramSvg }}></div>
+      
+      {/* Actions */}
       {diagramSvg && (
         <div>
-          <button className="button is-primary" onClick={downloadDiagram}>Download SVG</button>
-          <div className="highlight" id="diagram-url">
-            <pre><code className="language-http static">{diagramUrl}</code></pre>
-            <button className="button is-small bd-copy" onClick={copyDiagramUrlToClipboard} title="Copy to clipboard">Copy</button>
-          </div>
+          <button onClick={downloadDiagram}>Download SVG</button>
+          <button onClick={copyDiagramUrlToClipboard}>Copy URL</button>
         </div>
       )}
 
-      {error && (
-        <article className="message is-danger">
-          <div className="message-body">{error}</div>
-        </article>
-      )}
+      {/* Error Message */}
+      {error && <div>Error: {error}</div>}
     </div>
   );
 };
