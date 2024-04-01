@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { TextEncoder } from 'text-encoding';
 import pako from 'pako';
 
 
@@ -9,16 +10,8 @@ const DiagramGenerator = () => {
   const [diagramSource, setDiagramSource] = useState('');
   const [error, setError] = useState('');
 
-  function textEncode (str) {
-    if (window.TextEncoder) {
-      return new TextEncoder('utf-8').encode(str);
-    }
-    var utf8 = unescape(encodeURIComponent(str));
-    var result = new Uint8Array(utf8.length);
-    for (var i = 0; i < utf8.length; i++) {
-      result[i] = utf8.charCodeAt(i);
-    }
-    return result;
+  function textEncode(str) {
+    return new TextEncoder('utf-8').encode(str);
   }
 
   // Correctly implemented generateDiagram function
