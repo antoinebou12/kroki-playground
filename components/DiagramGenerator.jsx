@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { TextEncoder } from 'text-encoding';
 import pako from 'pako';
-
+import { encode as btoa } from "base-64";
 
 const DiagramGenerator = () => {
   const [diagramUrl, setDiagramUrl] = useState('');
