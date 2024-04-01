@@ -119,8 +119,50 @@ const DiagramGenerator = () => {
     element.click();
   };
 
+  const styles = {
+    container: {
+      marginTop: '20px',
+      padding: '10px',
+      border: '1px solid #ccc',
+      borderRadius: '5px',
+    },
+    field: {
+      marginBottom: '10px',
+    },
+    label: {
+      fontWeight: 'bold',
+    },
+    select: {
+      width: '100%',
+      padding: '8px',
+      margin: '5px 0',
+      borderRadius: '4px',
+      boxSizing: 'border-box',
+    },
+    textarea: {
+      width: '100%',
+      height: '150px',
+      padding: '12px 20px',
+      boxSizing: 'border-box',
+      borderRadius: '4px',
+      backgroundColor: '#f8f8f8',
+      resize: 'none',
+    },
+    button: {
+      cursor: 'pointer',
+      padding: '10px 20px',
+      margin: '5px',
+      borderRadius: '5px',
+      border: '1px solid #ddd',
+      backgroundColor: '#f0f0f0',
+      ':hover': {
+        backgroundColor: '#e9e9e9',
+      },
+    },
+  };
+
   return (
-    <div>
+    <div style={styles.container}>
       {/* Diagram Type Selection */}
       <div className="field">
         <label className="label">Diagram Type</label>
