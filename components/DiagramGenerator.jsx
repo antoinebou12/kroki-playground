@@ -39,6 +39,8 @@ const DiagramGenerator = () => {
   const generateDiagram = useCallback(async () => {
     if (!diagramSource.trim()) return;
 
+    console.log(diagramSource)
+
     const encoded = btoa(
       pako.deflate(textEncode(diagramSource), { level: 9, to: "string" })
     )
