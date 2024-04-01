@@ -1,4 +1,11 @@
 {
   "version": 2,
-  "builds": [{ "src": "package.json", "use": "@vercel/next" }]
+  "builds": [{ "src": "package.json", "use": "@vercel/next" }],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/$1",
+      "methods": ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"]
+    }
+  ]
 }
