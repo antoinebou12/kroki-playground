@@ -7,6 +7,16 @@ function textEncode(str) {
   return new TextEncoder("utf-8").encode(str);
 }
 
+function decompressFromEncodedURIComponent(encoded) {
+  const binaryString = atob(encoded.replace(/-/g, '+').replace(/_/g, '/'));
+  const charCodes = new Uint8Array(binaryString.length);
+  for (let i = 0; i < binaryString.length; i++) {
+    charCodes[i] = binaryString.charCodeAt(i);
+  }
+  const decompressed = pako.inflate(charCodes, { to: 'string' });
+  return decompressed; // Corrected from return decompress;
+}
+
 const DiagramGenerator = () => {
   const [diagramUrl, setDiagramUrl] = useState('');
   const [diagramSvg, setDiagramSvg] = useState('');
@@ -43,6 +53,18 @@ const DiagramGenerator = () => {
 
 
   useEffect(() => {
+    const queryParams = new URLSearchParams(window.location.search);
+    const sourceParam = queryParams.get('source');
+    const typeParam = queryParams.get('type');
+  
+    if (typeParam) {
+      setSelectedDiagram(typeParam);
+    }
+  
+    if (sourceParam) {
+      const diagramSource = decompressFromEncodedURIComponent(sourceParam);
+      setDiagramSource(diagramSource);
+    }
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
         const storedSelectedDiagram = localStorage.getItem('selectedDiagram');
@@ -65,12 +87,28 @@ const DiagramGenerator = () => {
     generateDiagram();
   }, [generateDiagram, diagramSource, selectedDiagram]);
 
-  // Handlers for user inputs and actions
-  const handleDiagramTypeChange = (e) => setSelectedDiagram(e.target.value);
-  const handleDiagramSourceChange = (e) => {
-    const source = e.target.value;
-    setDiagramSource(source);
+  const updateUrl = (type, source) => {
+    const compressedSource = pako.deflate(textEncode(source), { level: 9, to: "Uint8Array" });
+    const encodedSource = btoa(String.fromCharCode(...compressedSource))
+      .replace(/\+/g, "-")
+      .replace(/\//g, "_");
+    
+    const newUrl = `${window.location.pathname}?type=${type}&source=${encodedSource}`;
+    window.history.pushState({ path: newUrl }, '', newUrl);
   };
+  
+  const handleDiagramTypeChange = (e) => {
+    const newType = e.target.value;
+    setSelectedDiagram(newType);
+    updateUrl(newType, diagramSource);
+  };
+  
+  const handleDiagramSourceChange = (e) => {
+    const newSource = e.target.value;
+    setDiagramSource(newSource);
+    updateUrl(selectedDiagram, newSource);
+  };
+
   const copyDiagramUrlToClipboard = () => navigator.clipboard.writeText(diagramUrl).then(() => alert('Diagram URL copied to clipboard!'));
   const downloadDiagram = () => {
     const element = document.createElement("a");
