@@ -3,6 +3,10 @@ import pako from "pako";
 import { TextEncoder } from "text-encoding";
 import { encode as btoa } from "base-64";
 
+function textEncode(str) {
+  return new TextEncoder("utf-8").encode(str);
+}
+
 const DiagramGenerator = () => {
   const [diagramUrl, setDiagramUrl] = useState('');
   const [diagramSvg, setDiagramSvg] = useState('');
@@ -12,13 +16,7 @@ const DiagramGenerator = () => {
 
 
   const generateDiagram = useCallback(async () => {
-    if (!diagramSource.trim()) return;
-
     try {
-      function textEncode(str) {
-        return new TextEncoder("utf-8").encode(str);
-      }
-      
       const encoded = btoa(
         pako.deflate(textEncode(diagramSource), { level: 9, to: "string" })
       )
