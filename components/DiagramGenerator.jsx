@@ -68,7 +68,6 @@ const DiagramGenerator = () => {
   const handleDiagramSourceChange = (e) => {
     const source = e.target.value;
     setDiagramSource(source);
-    generateDiagram();
   };
   const copyDiagramUrlToClipboard = () => navigator.clipboard.writeText(diagramUrl).then(() => alert('Diagram URL copied to clipboard!'));
   const downloadDiagram = () => {
