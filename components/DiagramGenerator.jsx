@@ -39,12 +39,7 @@ const DiagramGenerator = () => {
   const generateDiagram = useCallback(async () => {
     if (!diagramSource.trim()) return;
 
-    const encodedSource = btoa(unescape(encodeURIComponent(diagramSource)));
-    const compressedSource = pako.deflate(encodedSource, { to: 'string' });
-    const base64Source = btoa(compressedSource)
-      .replace(/\+/g, '-')
-      .replace(/\//g, '_')
-      .replace(/=+$/, ''); // URL safe base64 and remove padding
+    const base64Source = btoa(pako.deflate(textEncode(diagramSource), { level: 9, to: "string" })).replace(/\+/g, "-").replace(/\//g, "_");
 
     const url = `https://kroki.io/${selectedDiagram}/svg/${base64Source}`;
 
