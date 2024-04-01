@@ -36,12 +36,12 @@ export default async function handler(req, res) {
   let diagramSource, selectedDiagram, outputFormat;
 
   if (req.method === 'POST') {
-    ({ diagramSource, selectedDiagram, outputFormat } = req.body);
+    ({ diagramSource, selectedDiagram, outputFormat = "svg" } = req.body);
   } else if (req.method === 'GET') {
     const queryParams = new URLSearchParams(req.query);
     diagramSource = queryParams.get('diagramSource');
     selectedDiagram = queryParams.get('selectedDiagram');
-    outputFormat = queryParams.get('outputFormat');
+    outputFormat = queryParams.get('outputFormat') || "svg";
   } else {
     // Handle any requests that aren't GET or POST
     res.setHeader('Allow', ['GET', 'POST']);
