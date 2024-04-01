@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { TextEncoder } from 'text-encoding';
-import pako from 'pako';
+import pako from "pako";
+import { TextEncoder } from "text-encoding";
 import { encode as btoa } from "base-64";
 
 const DiagramGenerator = () => {
@@ -10,22 +10,15 @@ const DiagramGenerator = () => {
   const [diagramSource, setDiagramSource] = useState('');
   const [error, setError] = useState('');
 
-  function textEncode(str) {
-    return new TextEncoder('utf-8').encode(str);
-  }
 
-  // Correctly implemented generateDiagram function
   const generateDiagram = useCallback(async () => {
     if (!diagramSource.trim()) return;
 
-    console.log(diagramSource)
-    console.log(textEncode(diagramSource))
+    function textEncode(str) {
+      return new TextEncoder("utf-8").encode(str);
+    }
 
-    const encoded = btoa(
-      pako.deflate(textEncode(diagramSource), { level: 9, to: "string" })
-    )
-      .replace(/\+/g, "-")
-      .replace(/\//g, "_");
+    let encoded = btoa(pako.deflate(textEncode(diagramSource), { level: 9, to: "string" })).replace(/\+/g, "-").replace(/\//g, "_");
   
     const url = `https://kroki.io/${selectedDiagram}/svg/${encoded}`;
 
@@ -76,7 +69,6 @@ const DiagramGenerator = () => {
   const handleDiagramSourceChange = (e) => {
     const source = e.target.value;
     setDiagramSource(source);
-    // Generate diagram when the diagram source changes
     generateDiagram();
   };
   const copyDiagramUrlToClipboard = () => navigator.clipboard.writeText(diagramUrl).then(() => alert('Diagram URL copied to clipboard!'));
