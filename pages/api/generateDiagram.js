@@ -32,41 +32,55 @@ const LANGUAGE_OUTPUT_SUPPORT = {
   "wireviz": ["png", "svg"],
 };
 
-
 export default async function handler(req, res) {
+  let diagramSource, selectedDiagram, outputFormat;
+
   if (req.method === 'POST') {
-    const { diagramSource, selectedDiagram, outputFormat } = req.body;
-
-    const formats = LANGUAGE_OUTPUT_SUPPORT[selectedDiagram] || [];
-    const format = formats.includes(outputFormat) ? outputFormat : formats[0]; // Default to first supported format
-
-    try {
-      const compressed = pako.deflate(textEncode(diagramSource), { level: 9, to: "Uint8Array" });
-      const encoded = btoa(String.fromCharCode(...compressed))
-        .replace(/\+/g, "-")
-        .replace(/\//g, "_");
-      
-      const url = `https://kroki.io/${selectedDiagram}/${format}/${base64Encoded}`;
-      
-      // Fetch the SVG from Kroki
-      const response = await axios.get(url, { responseType: 'arraybuffer' });
-
-      // Convert binary data to base64
-      const diagramData = Buffer.from(response.data).toString('base64');
-      const mimeType = `image/${format === 'jpeg' ? 'jpeg' : format === 'svg' ? 'svg+xml' : format}`;
-      
-      res.status(200).json({
-        diagramUrl: url,
-        diagramData: diagramData,
-        mimeType: mimeType
-      });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: 'Failed to fetch the diagram' });
-    }
+    ({ diagramSource, selectedDiagram, outputFormat } = req.body);
+  } else if (req.method === 'GET') {
+    const queryParams = new URLSearchParams(req.query);
+    diagramSource = queryParams.get('diagramSource');
+    selectedDiagram = queryParams.get('selectedDiagram');
+    outputFormat = queryParams.get('outputFormat');
   } else {
-    // Handle any requests that aren't POST
-    res.setHeader('Allow', ['POST']);
+    // Handle any requests that aren't GET or POST
+    res.setHeader('Allow', ['GET', 'POST']);
     res.status(405).end(`Method ${req.method} Not Allowed`);
+    return;
+  }
+
+  const formats = LANGUAGE_OUTPUT_SUPPORT[selectedDiagram] || [];
+  const format = formats.includes(outputFormat) ? outputFormat : formats[0]; // Default to first supported format
+
+  try {
+    const compressed = pako.deflate(textEncode(diagramSource), { level: 9, to: "Uint8Array" });
+    const encoded = btoa(String.fromCharCode(...compressed))
+      .replace(/\+/g, "-")
+      .replace(/\//g, "_");
+
+    const url = `https://kroki.io/${selectedDiagram}/${format}/${encoded}`;
+
+    // Fetch the diagram from Kroki
+    const response = await axios.get(url, { responseType: 'arraybuffer' });
+
+    // Convert binary data to base64
+    const diagramData = Buffer.from(response.data).toString('base64');
+    const mimeType = `image/${format === 'jpeg' ? 'jpeg' : format === 'svg' ? 'svg+xml' : format}`;
+
+    res.status(200).json({
+      diagramUrl: url,
+      diagramData: diagramData,
+      mimeType: mimeType
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: 'Failed to fetch the diagram',
+      details: error.message,
+      attemptedUrl: url,
+      attemptedDiagramSource: diagramSource,
+      attemptedSelectedDiagram: selectedDiagram,
+      outputFormat: format,
+    });
   }
 }
