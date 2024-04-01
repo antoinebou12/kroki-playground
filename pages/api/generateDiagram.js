@@ -3,6 +3,20 @@ import { TextEncoder } from "text-encoding";
 import { encode as btoa } from "base-64";
 import axios from 'axios';
 
+function textEncode(str) {
+  return new TextEncoder("utf-8").encode(str);
+}
+
+function decompressFromEncodedURIComponent(encoded) {
+  const binaryString = atob(encoded.replace(/-/g, '+').replace(/_/g, '/'));
+  const charCodes = new Uint8Array(binaryString.length);
+  for (let i = 0; i < binaryString.length; i++) {
+    charCodes[i] = binaryString.charCodeAt(i);
+  }
+  const decompressed = pako.inflate(charCodes, { to: 'string' });
+  return decompressed; // Corrected from return decompress;
+}
+
 const LANGUAGE_OUTPUT_SUPPORT = {
   "blockdiag": ["png", "svg", "pdf"],
   "bpmn": ["svg"],
