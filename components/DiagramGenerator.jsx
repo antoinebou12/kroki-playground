@@ -73,7 +73,12 @@ const DiagramGenerator = () => {
 
   // Handlers for user inputs and actions
   const handleDiagramTypeChange = (e) => setSelectedDiagram(e.target.value);
-  const handleDiagramSourceChange = (e) => setDiagramSource(e.target.value);
+  const handleDiagramSourceChange = (e) => {
+    const source = e.target.value;
+    setDiagramSource(source);
+    // Generate diagram when the diagram source changes
+    generateDiagram();
+  };
   const copyDiagramUrlToClipboard = () => navigator.clipboard.writeText(diagramUrl).then(() => alert('Diagram URL copied to clipboard!'));
   const downloadDiagram = () => {
     const element = document.createElement("a");
