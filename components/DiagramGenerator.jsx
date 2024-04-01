@@ -14,21 +14,20 @@ const DiagramGenerator = () => {
   const generateDiagram = useCallback(async () => {
     if (!diagramSource.trim()) return;
 
-    function textEncode(str) {
-      return new TextEncoder("utf-8").encode(str);
-    }
-
-    console.log(diagramSource);
-    console.log(textEncode(diagramSource));
-    console.log(btoa(pako.deflate(textEncode(diagramSource), { level: 9, to: "string" })).replace(/\+/g, "-").replace(/\//g, "_"));
-
-    let encoded = btoa(pako.deflate(textEncode(diagramSource), { level: 9, to: "string" })).replace(/\+/g, "-").replace(/\//g, "_");
-  
-    const url = `https://kroki.io/${selectedDiagram}/svg/${encoded}`;
-
-    console.log(url);
-
     try {
+      function textEncode(str) {
+        return new TextEncoder("utf-8").encode(str);
+      }
+      
+      const encoded = btoa(
+        pako.deflate(textEncode(diagramSource), { level: 9, to: "string" })
+      )
+        .replace(/\+/g, "-")
+        .replace(/\//g, "_");
+
+      const url = `https://kroki.io/${selectedDiagram}/svg/${base64Encoded}`;
+      console.log(url);
+
       const response = await fetch(url);
       if (response.ok) {
         const svgContent = await response.text();
@@ -44,10 +43,6 @@ const DiagramGenerator = () => {
       setDiagramSvg('');
     }
   }, [diagramSource, selectedDiagram]);
-
-  useEffect(() => {
-    generateDiagram();
-  }, [generateDiagram]);
 
   useEffect(() => {
     const handleVisibilityChange = () => {
