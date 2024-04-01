@@ -17,9 +17,8 @@ const DiagramGenerator = () => {
 
   const generateDiagram = useCallback(async () => {
     try {
-      const encoded = btoa(
-        pako.deflate(textEncode(diagramSource), { level: 9, to: "string" })
-      )
+      const compressed = pako.deflate(textEncode(diagramSource), { level: 9, to: "Uint8Array" });
+      const encoded = btoa(String.fromCharCode(...compressed))
         .replace(/\+/g, "-")
         .replace(/\//g, "_");
 
