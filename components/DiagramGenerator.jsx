@@ -18,6 +18,10 @@ const DiagramGenerator = () => {
       return new TextEncoder("utf-8").encode(str);
     }
 
+    console.log(diagramSource);
+    console.log(textEncode(diagramSource));
+    console.log(btoa(pako.deflate(textEncode(diagramSource), { level: 9, to: "string" })).replace(/\+/g, "-").replace(/\//g, "_"));
+
     let encoded = btoa(pako.deflate(textEncode(diagramSource), { level: 9, to: "string" })).replace(/\+/g, "-").replace(/\//g, "_");
   
     const url = `https://kroki.io/${selectedDiagram}/svg/${encoded}`;
