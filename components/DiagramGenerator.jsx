@@ -16,9 +16,9 @@ function debounce(func, wait, immediate) {
   };
 }
 
-function textEncode(str) {
+function textEncode (str) {
   if (window.TextEncoder) {
-    return new TextEncoder().encode(str);
+    return new TextEncoder('utf-8').encode(str);
   }
   var utf8 = unescape(encodeURIComponent(str));
   var result = new Uint8Array(utf8.length);
@@ -39,9 +39,13 @@ const DiagramGenerator = () => {
   const generateDiagram = useCallback(async () => {
     if (!diagramSource.trim()) return;
 
-    const base64Source = btoa(pako.deflate(textEncode(diagramSource), { level: 9, to: "string" })).replace(/\+/g, "-").replace(/\//g, "_");
-
-    const url = `https://kroki.io/${selectedDiagram}/svg/${base64Source}`;
+    const encoded = btoa(
+      pako.deflate(textEncode(diagramSource), { level: 9, to: "string" })
+    )
+      .replace(/\+/g, "-")
+      .replace(/\//g, "_");
+  
+      const url = `https://kroki.io/${selectedDiagram}/svg/${encoded}`;
 
     try {
       const response = await fetch(url);
