@@ -25,7 +25,7 @@ const DiagramGenerator = () => {
         .replace(/\+/g, "-")
         .replace(/\//g, "_");
 
-      const url = `https://kroki.io/${selectedDiagram}/svg/${base64Encoded}`;
+      const url = `https://kroki.io/${selectedDiagram}/svg/${encoded}`;
       console.log(url);
 
       const response = await fetch(url);
