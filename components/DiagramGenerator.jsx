@@ -45,6 +45,11 @@ const DiagramGenerator = () => {
   }, [diagramSource, selectedDiagram]);
 
   useEffect(() => {
+    generateDiagram();
+  }, [generateDiagram]);
+
+
+  useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
         const storedSelectedDiagram = localStorage.getItem('selectedDiagram');
