@@ -1,32 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import pako from 'pako';
 
-function debounce(func, wait, immediate) {
-  var timeout;
-  return function() {
-    var context = this, args = arguments;
-    var later = function() {
-      timeout = null;
-      if (!immediate) func.apply(context, args);
-    };
-    var callNow = immediate && !timeout;
-    clearTimeout(timeout);
-    timeout = setTimeout(later, wait);
-    if (callNow) func.apply(context, args);
-  };
-}
-
-function textEncode (str) {
-  if (window.TextEncoder) {
-    return new TextEncoder('utf-8').encode(str);
-  }
-  var utf8 = unescape(encodeURIComponent(str));
-  var result = new Uint8Array(utf8.length);
-  for (var i = 0; i < utf8.length; i++) {
-    result[i] = utf8.charCodeAt(i);
-  }
-  return result;
-}
 
 const DiagramGenerator = () => {
   const [diagramUrl, setDiagramUrl] = useState('');
@@ -35,11 +9,24 @@ const DiagramGenerator = () => {
   const [diagramSource, setDiagramSource] = useState('');
   const [error, setError] = useState('');
 
+  function textEncode (str) {
+    if (window.TextEncoder) {
+      return new TextEncoder('utf-8').encode(str);
+    }
+    var utf8 = unescape(encodeURIComponent(str));
+    var result = new Uint8Array(utf8.length);
+    for (var i = 0; i < utf8.length; i++) {
+      result[i] = utf8.charCodeAt(i);
+    }
+    return result;
+  }
+
   // Correctly implemented generateDiagram function
   const generateDiagram = useCallback(async () => {
     if (!diagramSource.trim()) return;
 
     console.log(diagramSource)
+    console.log(textEncode(diagramSource))
 
     const encoded = btoa(
       pako.deflate(textEncode(diagramSource), { level: 9, to: "string" })
