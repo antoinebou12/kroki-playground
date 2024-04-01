@@ -44,10 +44,6 @@ const DiagramGenerator = () => {
     }
   }, [diagramSource, selectedDiagram]);
 
-  useEffect(() => {
-    generateDiagram();
-  }, [generateDiagram]);
-
 
   useEffect(() => {
     const handleVisibilityChange = () => {
@@ -67,6 +63,10 @@ const DiagramGenerator = () => {
     localStorage.setItem('selectedDiagram', selectedDiagram);
     localStorage.setItem('diagramSource', diagramSource);
   }, [selectedDiagram, diagramSource]);
+
+  useEffect(() => {
+    generateDiagram();
+  }, [generateDiagram, diagramSource, selectedDiagram]);
 
   // Handlers for user inputs and actions
   const handleDiagramTypeChange = (e) => setSelectedDiagram(e.target.value);
