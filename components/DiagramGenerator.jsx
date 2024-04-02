@@ -122,41 +122,58 @@ const DiagramGenerator = () => {
   const styles = {
     container: {
       marginTop: '20px',
-      padding: '10px',
-      border: '1px solid #ccc',
-      borderRadius: '5px',
+      padding: '20px',
+      border: '1px solid #e0e0e0',
+      borderRadius: '8px',
+      backgroundColor: '#f9f9f9',
+      boxShadow: '0 2px 4px rgba(0,0,0,0.1)', // Added subtle shadow
+      maxWidth: '600px', // Limit width for better focus
+      margin: '20px auto', // Center container
     },
     field: {
-      marginBottom: '10px',
+      marginBottom: '15px',
     },
     label: {
-      fontWeight: 'bold',
+      display: 'block', // Ensure label takes its own line
+      marginBottom: '5px',
+      fontWeight: '600',
+      color: '#333',
     },
     select: {
       width: '100%',
-      padding: '8px',
-      margin: '5px 0',
+      padding: '10px',
+      margin: '5px 0 15px', // Increase bottom margin
       borderRadius: '4px',
+      border: '1px solid #ccc',
       boxSizing: 'border-box',
+      backgroundColor: 'white',
+      cursor: 'pointer',
     },
     textarea: {
       width: '100%',
-      height: '150px',
+      minHeight: '100px', // Start with a reasonable default height
       padding: '12px 20px',
       boxSizing: 'border-box',
       borderRadius: '4px',
-      backgroundColor: '#f8f8f8',
-      resize: 'none',
+      border: '1px solid #ccc',
+      backgroundColor: 'white',
+      resize: 'vertical', // Allow vertical resizing
+      fontFamily: 'sans-serif', // Use a more modern font
+      fontSize: '14px', // Set font size
     },
     button: {
       cursor: 'pointer',
       padding: '10px 20px',
       margin: '5px',
-      borderRadius: '5px',
-      border: '1px solid #ddd',
-      backgroundColor: '#f0f0f0',
+      borderRadius: '4px',
+      border: 'none',
+      backgroundColor: '#007bff',
+      color: 'white',
+      fontSize: '14px',
+      fontWeight: '500',
+      transition: 'background-color 0.3s',
       ':hover': {
-        backgroundColor: '#e9e9e9',
+        backgroundColor: '#0056b3',
       },
     },
   };
