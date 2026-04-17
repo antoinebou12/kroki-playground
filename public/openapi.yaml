@@ -1,0 +1,162 @@
+openapi: 3.0.3
+info:
+  title: Kroki Playground API
+  description: |
+    Proxies diagram generation to a Kroki server (`KROKI_BASE_URL`, default `https://kroki.io`).
+    Diagram types and path segments match [Kroki](https://kroki.io) (e.g. `vega-lite`, not `vegalite`).
+  version: 1.0.0
+servers:
+  - url: /
+    description: Same origin
+paths:
+  /api/generateDiagram:
+    get:
+      summary: Generate diagram (query parameters)
+      operationId: generateDiagramGet
+      parameters:
+        - name: selectedDiagram
+          in: query
+          required: true
+          schema:
+            type: string
+            example: plantuml
+          description: Kroki diagram type slug (e.g. `plantuml`, `mermaid`, `vega-lite`).
+        - name: diagramSource
+          in: query
+          required: false
+          schema:
+            type: string
+            default: ""
+          description: Raw diagram text (empty allowed). Max length 512000 characters.
+        - name: outputFormat
+          in: query
+          required: false
+          schema:
+            type: string
+            example: svg
+          description: Output format supported for the diagram type (e.g. `svg`, `png`). Omitted uses the first supported format.
+      responses:
+        "200":
+          description: Base64-encoded diagram payload
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenerateDiagramResponse"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "502":
+          description: Kroki upstream error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpstreamErrorResponse"
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      summary: Generate diagram (JSON body)
+      operationId: generateDiagramPost
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GenerateDiagramRequest"
+      responses:
+        "200":
+          description: Base64-encoded diagram payload
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenerateDiagramResponse"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "502":
+          description: Kroki upstream error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpstreamErrorResponse"
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/openapi:
+    get:
+      summary: OpenAPI document (YAML)
+      operationId: getOpenApi
+      responses:
+        "200":
+          description: OpenAPI 3 YAML
+          content:
+            application/yaml:
+              schema:
+                type: string
+components:
+  schemas:
+    GenerateDiagramRequest:
+      type: object
+      required:
+        - selectedDiagram
+      properties:
+        diagramSource:
+          type: string
+          description: Raw diagram text
+        selectedDiagram:
+          type: string
+          example: plantuml
+        outputFormat:
+          type: string
+          example: svg
+    GenerateDiagramResponse:
+      type: object
+      properties:
+        diagramUrl:
+          type: string
+          format: uri
+          description: Full Kroki URL that was requested
+        diagramData:
+          type: string
+          description: Base64-encoded bytes of the rendered asset
+        mimeType:
+          type: string
+          example: image/svg+xml
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        code:
+          type: string
+        details:
+          type: string
+        fields:
+          type: object
+          additionalProperties:
+            type: string
+    UpstreamErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        code:
+          type: string
+          example: KROKI_UPSTREAM_ERROR
+        upstreamStatus:
+          type: integer
+        attemptedUrl:
+          type: string
+          format: uri

@@ -1,0 +1,73 @@
+name: Bug report
+description: Report unexpected behavior or a broken workflow
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before submitting: search [existing issues](https://github.com/antoinebou12/kroki-playground/issues) for duplicates.
+        Reference other issues with `#123` in any field below.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What went wrong in one or two sentences?
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Browser and version, OS, Node version (e.g. from `node -v`), and whether you use the dev container.
+      placeholder: |
+        Browser: …
+        OS: …
+        Node: …
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Minimal steps that show the bug every time (or often).
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected_actual
+    attributes:
+      label: Expected vs actual behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: kroki
+    attributes:
+      label: Kroki / URL context (optional)
+      description: Diagram type, sample source, or `NEXT_PUBLIC_KROKI_BASE_URL` if not the default public Kroki.
+
+  - type: textarea
+    id: blocked_by
+    attributes:
+      label: Blocked by (optional)
+      description: Issues that must be resolved first. Use `#123` format.
+
+  - type: textarea
+    id: blocks
+    attributes:
+      label: Blocks (optional)
+      description: Issues that cannot proceed until this is fixed. Use `#123` format.
+
+  - type: textarea
+    id: checklist
+    attributes:
+      label: Progress checklist
+      description: Edit the checkboxes as you investigate.
+      value: |
+        - [ ] Reproduced on latest `main`
+        - [ ] Minimal repro attached or described below
+    validations:
+      required: false

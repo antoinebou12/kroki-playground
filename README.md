@@ -1,50 +1,57 @@
 # Kroki Playground
 
-Welcome to the Kroki Playground! This project allows you to experiment with various diagram types provided by Kroki, a service that converts text diagrams into images.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js&logoColor=white)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)](https://react.dev/)
+[![Node.js](https://img.shields.io/badge/node-%3E%3D22-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
 
-## Description
+Experiment with [Kroki](https://kroki.io) diagram types in the browser: pick a format, paste source text, and preview SVG. Shareable URLs encode type and compressed source.
 
-Kroki supports a wide range of diagram types including BlockDiag, BPMN, PlantUML, and many more. This playground provides a simple web interface where you can select a diagram type, input the diagram source code, and instantly visualize the generated diagram.
+## Features
 
-## How to Use
+- **Live preview** against `https://kroki.io` or your own Kroki instance (`NEXT_PUBLIC_KROKI_BASE_URL`).
+- **REST API** at `/api/generateDiagram` (GET or POST) returning base64 diagram bytes — see **[API docs](/api-docs)** or [`public/openapi.yaml`](public/openapi.yaml) / [`GET /api/openapi`](/api/openapi).
 
-1. **Select Diagram Type**: Choose the type of diagram you want to create from the dropdown menu.
-2. **Input Diagram Source**: Enter the source code for your diagram in the textarea provided.
-3. **View Diagram**: As you input the source code, the diagram will be generated and displayed in real-time.
-4. **Copy Diagram URL**: You can copy the URL of the generated diagram to share it with others.
+## Requirements
 
-## Technologies Used
+- **Node.js** ≥ 22 (see [`.nvmrc`](.nvmrc) and `engines` in [`package.json`](package.json)). Match your [Vercel](https://vercel.com/docs/functions/runtimes/node-js/node-js-versions) project Node version to your environment.
 
-- **Frontend**: HTML, CSS, JavaScript
-- **Diagram Generation**: Kroki service (https://kroki.io)
-- **Deployment**: Vercel
+## Environment variables
 
-## Demo
+| Variable | Where | Description |
+| -------- | ----- | ----------- |
+| `KROKI_BASE_URL` | Server | Base URL for the Kroki server used by `/api/generateDiagram` (default `https://kroki.io`). |
+| `NEXT_PUBLIC_KROKI_BASE_URL` | Client | Base URL for in-browser preview in the playground (default `https://kroki.io`). |
 
-You can access the live demo of the Kroki Playground [here](#).
+## Local development
 
-## Local Development
+```bash
+git clone https://github.com/antoinebou12/kroki-playground.git
+cd kroki-playground
+npm install
+npm run dev
+```
 
-To run this project locally:
+Open [http://localhost:3000](http://localhost:3000).
 
-1. Clone the repository:
+## Scripts
 
-   ```
-   git clone https://github.com/antoinebou12/kroki-playground.git
-   ```
+| Command | Description |
+| ------- | ----------- |
+| `npm run dev` | Next.js dev server (Turbopack). |
+| `npm run build` | Production build. |
+| `npm run start` | Run production server after `build`. |
+| `npm run lint` | ESLint. |
+| `npm test` | Vitest unit tests. |
 
-2. Navigate to the project directory:
+## Deployment (Vercel)
 
-   ```
-   cd kroki-playground
-   ```
-
-3. Open `index.html` in your web browser.
+The repo includes [`vercel.json`](vercel.json) with the Next.js framework preset and `npm install` / `npm run build` so Vercel uses the same install and build as local. Import the project in Vercel, set **Node.js** to match `.nvmrc` (22.x), and add `KROKI_BASE_URL` / `NEXT_PUBLIC_KROKI_BASE_URL` in **Project → Settings → Environment Variables** if you use a private Kroki instance.
 
 ## Contributing
 
-Contributions to this project are welcome! If you have any ideas for improvement or find any issues, feel free to open an issue or submit a pull request.
+See [CONTRIBUTING.md](CONTRIBUTING.md). Report security vulnerabilities per [SECURITY.md](SECURITY.md).
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
+[MIT License](LICENSE).

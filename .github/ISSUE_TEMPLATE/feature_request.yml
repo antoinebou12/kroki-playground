@@ -1,0 +1,51 @@
+name: Feature request
+description: Suggest an idea or improvement
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Reference related issues with `#123` in any field below.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or motivation
+      description: What is frustrating, missing, or unclear today?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: What should happen instead? Be as concrete as you can.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered (optional)
+      description: Other approaches you thought about and why you prefer yours.
+
+  - type: textarea
+    id: blocked_by
+    attributes:
+      label: Blocked by (optional)
+      description: Issues that should be done first. Use `#123` format.
+
+  - type: textarea
+    id: blocks
+    attributes:
+      label: Blocks (optional)
+      description: Work that depends on this. Use `#123` format.
+
+  - type: textarea
+    id: tasklist
+    attributes:
+      label: Draft task list (optional)
+      description: Break the work into markdown task lists (`- [ ]` / `- [x]`).
+      value: |
+        - [ ] …
+        - [ ] …

@@ -1,0 +1,24 @@
+{
+  "name": "Kroki Playground",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:1-22-bookworm",
+  "remoteUser": "node",
+  "postCreateCommand": "npm install",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "bradlc.vscode-tailwindcss"
+      ],
+      "settings": {
+        "editor.formatOnSave": true
+      }
+    }
+  },
+  "forwardPorts": [3000],
+  "portsAttributes": {
+    "3000": {
+      "label": "Next.js",
+      "onAutoForward": "notify"
+    }
+  }
+}
